@@ -397,7 +397,7 @@ namespace LifeAI
 
         private ValueTraitData FindValueTrait(EntityData ed, Entity traitOwner, Trait trait, bool add = false)
         {
-            ValueTraitData result = ed.ValueTraitList.FirstOrDefault(x => x.TraitOwner == traitOwner);
+            ValueTraitData result = ed.ValueTraitList.FirstOrDefault(x => (x.TraitOwner == traitOwner) && (x.Trait == trait));
             if (result != null)
             {
                 return result;
@@ -963,6 +963,7 @@ namespace LifeAI
 
                             // Optionally display action information when
                             // LAI_DEBUG is enabled
+#if LAI_DEBUG
                             Trace.WriteLine("");
                             Trace.WriteLine("");
                             if (preaction)
@@ -985,6 +986,7 @@ namespace LifeAI
                             {
                                 Trace.WriteLine("          Member: " + n);
                             }
+#endif
                             // Debug END
 
                             int cm2 = 0;
@@ -1065,7 +1067,7 @@ namespace LifeAI
 
                                         // Average the correlation results to get an
                                         // approximate trait amount change
-                                        if (!skipCor && (amountSum > 0))
+                                        if (!skipCor && (amountSum != 0))
                                         {
                                             modifyAmount = (float)(amountSum / amountCount);
                                         }
@@ -1085,7 +1087,7 @@ namespace LifeAI
                                         }
                                     }
 
-                                    if (modifyAmount > 0)
+                                    if (modifyAmount != 0)
                                     {
                                         // Lock in the alt trait amount before continuing
                                         // to next step.  Adds to altTraitList for step.
@@ -1121,7 +1123,7 @@ namespace LifeAI
 
 
                                         // Calculate the value of the trait change
-                                        if ((valueStandard > 0) && (valueTrait > 0))
+                                        if ((valueStandard != 0) && (valueTrait != 0))
                                         {
                                             valueSum += (modifyAmount / valueStandard) * valueTrait;
                                         }
@@ -1131,15 +1133,18 @@ namespace LifeAI
                                         }
                                     }
                                 } // Modifier iteration END
+                                cm2++;
                             } // Member iteration END
 
 
                             // DEBUG Start
+#if LAI_DEBUG
                             if (reaction)
                             {
                                 Trace.WriteLine("      valueSum: " + valueSum.ToString("n3"));
                                 Trace.WriteLine("  selfvalueSum: " + selfValueSum.ToString("n3"));
                             }
+#endif
                             // DEBUG END
 
                             if (preaction)
@@ -1149,7 +1154,7 @@ namespace LifeAI
                                 // since the amounts can change.
                                 foreach (AltTraitData altx in actor.StepTrack.AltTraitList)
                                 {
-                                    alt.Trait.Amount = alt.AltAmount;
+                                    altx.Trait.Amount = alt.AltAmount;
                                 }
 
                                 // Calculate reactions of entities involved in action
@@ -1167,7 +1172,7 @@ namespace LifeAI
 
                                         // Only factor in the first step's value to actor
                                         StepData s = entity.StepList.FirstOrDefault();
-                                        if (s!=null)
+                                        if (s != null)
                                         {
                                             // Get the first step self value
                                             // and add to the original entity's valueSum
@@ -1222,14 +1227,17 @@ namespace LifeAI
                             }
 
                             // DEBUG Start
+#if LAI_DEBUG
                             if (preaction)
                             {
                                 Trace.WriteLine("valueSum after reaction: " + valueSum.ToString("n3"));
                             }
+#endif
                             // DEBUG END
 
                             actor.StepTrack.TempPlan.Step = actor.StepCount;
                             actor.StepTrack.TempPlan.Action = a.Action;
+                            actor.StepTrack.TempPlan.Member.Clear();
                             foreach (Entity ed in eStack.Select(x => x.Current.Entity))
                             {
                                 actor.StepTrack.TempPlan.Member.Add(ed);
@@ -1284,10 +1292,12 @@ namespace LifeAI
                                     // temp data to best plan data
 
                                     // DEBUG Start
+#if LAI_DEBUG
                                     if (reaction)
                                     {
                                         Trace.WriteLine("Best action stored");
                                     }
+#endif
                                     // DEBUG END
 
                                     foreach (StepData s in actor.StepList)
@@ -1341,7 +1351,7 @@ namespace LifeAI
 
 
                         Stack<IEnumerator<EntityData>> revStack = new Stack<IEnumerator<EntityData>>();
-                        while (eStack.Count>0)
+                        while (eStack.Count > 0)
                         {
                             IEnumerator<EntityData> tempEN = eStack.Last();
                             if (!tempEN.MoveNext())
@@ -1369,15 +1379,9 @@ namespace LifeAI
             }
         }
 
-        public void StartActíon(Entity entity, Action action, params Entity[] mems)
+        public void StartActíon(Entity entity = null, Action action = null, params Entity[] mems)
         {
             List<Entity> members = new List<Entity>();
-
-            // Insert entity as first member
-            members.Insert(0, entity);
-
-            members.AddRange(mems);
-
             List<EntityData> e = new List<EntityData>();
 
             // if no action specified, defaults to starting
@@ -1390,6 +1394,7 @@ namespace LifeAI
                 PlanData p = planList.FirstOrDefault();
                 if (p != null)
                 {
+                    e.Add(FindEntity(p.Member.First()));
                     action = p.Action;
                     foreach (Entity m in members)
                     {
@@ -1405,6 +1410,10 @@ namespace LifeAI
             }
             else
             {
+                // Insert entity as first member
+                members.Insert(0, entity);
+
+                members.AddRange(mems);
                 foreach (Entity m in members)
                 {
                     EntityData ed = FindEntity(m, true);
@@ -1779,13 +1788,13 @@ namespace LifeAI
         public int GetCorrelationCount(Action action, int member, Trait trait)
         {
             ActionData a = FindAction(action);
-            if (a!=null)
+            if (a != null)
             {
                 MemberData m = FindMember(a, member);
-                if (m!=null)
+                if (m != null)
                 {
                     ModifyData mod = FindModify(m, trait);
-                    if (mod!=null)
+                    if (mod != null)
                     {
                         return mod.CorrelationCount;
                     }
@@ -1793,20 +1802,20 @@ namespace LifeAI
             }
             return 0;
         }
- 
-        public float GetCorrelation(Action action, int member, Trait trait, int correlationNumber=0, bool slope=false, bool intercept=false)
+
+        public float GetCorrelation(Action action, int member, Trait trait, int correlationNumber = 0, bool slope = false, bool intercept = false)
         {
             ActionData a = FindAction(action);
-            if (a!=null)
+            if (a != null)
             {
                 MemberData m = FindMember(a, member);
-                if (m!=null)
+                if (m != null)
                 {
                     ModifyData mod = FindModify(m, trait);
-                    if (mod!=null)
+                    if (mod != null)
                     {
                         CorrelationData c = FindCorrelation(mod, correlationNumber);
-                        if (c!=null)
+                        if (c != null)
                         {
                             if (slope)
                             {
@@ -1824,10 +1833,10 @@ namespace LifeAI
             return Constants.LAI_DEF_AMOUNT;
         }
 
-        private CorrelationData FindCorrelation(ModifyData mod, int correlationNumber, bool add=false)
+        private CorrelationData FindCorrelation(ModifyData mod, int correlationNumber, bool add = false)
         {
             CorrelationData c = mod.CorrelationList.FirstOrDefault(x => correlationNumber == mod.CorrelationList.IndexOf(x));
-            if (c!=null)
+            if (c != null)
             {
                 return c;
             }
@@ -1841,7 +1850,7 @@ namespace LifeAI
         public int GetPlanCount()
         {
             PlanData p = planList.Last();
-            if (p!=null)
+            if (p != null)
             {
                 return p.Step + 1;
             }
@@ -1851,7 +1860,7 @@ namespace LifeAI
         public int GetRecordCount(Action action)
         {
             ActionData a = FindAction(action);
-            if (a!=null)
+            if (a != null)
             {
                 return a.RecordCount;
             }

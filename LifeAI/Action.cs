@@ -11,6 +11,8 @@ namespace LifeAI
         private static List<Action> mainActionList = new List<Action>();
         private static int mainActionCount = 0;
 
+        public List<Func<bool, Entity>> Preconditions = new List<Func<bool, Entity>>();
+        public List<Action<Entity>> ActionCallbacks = new List<Action<Entity>>();
 
         private int memberCount = 0;
         public int MemberCount

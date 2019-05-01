@@ -10,7 +10,7 @@ namespace LifeAI.Structs
     {
         public int Step;
         public Action Action;
-        public List<Entity> Member=new List<Entity>();
+        public List<Entity> Member = new List<Entity>();
         public float Value;
         public float TotalValue;
         public float SelfValue;
