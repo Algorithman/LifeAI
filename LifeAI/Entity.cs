@@ -10,21 +10,6 @@ namespace LifeAI
 {
     public class Entity
     {
-        const int LAI_DEF_VALUE = 0;
-        const int LAI_DEF_STANDARD = 1;
-        const int LAI_DEF_RECORD = 0;
-        const int LAI_DEF_AMOUNT = 0;
-        const int LAI_ACTOR_MEMBER = 0;
-        const int LAI_MAX_RECORD = 32;
-        const int LAI_DEF_REACT_STEPS = 1;
-        const int LAI_DEF_STEPS = 1;
-        const int LAI_MAX_MEMBER = 4;
-        const int LAI_MIN_ACTION_VALUE = -99999;
-        const int LAI_MIN_REACTION_VALUE = -99999;
-        const int LAI_MIN_RECORD_AVERAGE = 4;
-        const int LAI_MIN_RECORD_CORRELATION = 4;
-        const float LAI_MIN_COEF = 0.8f;
-        const int LAI_DEF_SHIFT = 1;
 
         private static List<Entity> MainEntityList = new List<Entity>();
         private static int MainEntityCount = 0;
@@ -127,8 +112,8 @@ namespace LifeAI
             entityData.ValueTraitList.Add(valueTraitData);
             valueTraitData.TraitOwner = traitOwner;
             valueTraitData.Trait = trait;
-            valueTraitData.Value = LAI_DEF_VALUE;
-            valueTraitData.Standard = LAI_DEF_STANDARD;
+            valueTraitData.Value = Constants.LAI_DEF_VALUE;
+            valueTraitData.Standard = Constants.LAI_DEF_STANDARD;
 
             // Add if not already in list
             FindEntity(traitOwner, true);
@@ -158,7 +143,7 @@ namespace LifeAI
         {
             ActionData newAction = new ActionData();
             newAction.Action = action;
-            newAction.RecordCount = LAI_DEF_RECORD;
+            newAction.RecordCount = Constants.LAI_DEF_RECORD;
             actionList.Add(newAction);
 
             for (int i = 0; i < action.MemberCount; i++)
@@ -193,8 +178,8 @@ namespace LifeAI
             ModifyData md = new ModifyData();
             m.ModifyList.Add(md);
             md.Trait = trait;
-            md.Basic = LAI_DEF_AMOUNT;
-            md.Average = LAI_DEF_AMOUNT;
+            md.Basic = Constants.LAI_DEF_AMOUNT;
+            md.Average = Constants.LAI_DEF_AMOUNT;
             return md;
         }
 
@@ -202,11 +187,11 @@ namespace LifeAI
         {
             CorrelationData cd = new CorrelationData();
             md.CorrelationList.Add(cd);
-            cd.Member = LAI_ACTOR_MEMBER;
+            cd.Member = Constants.LAI_ACTOR_MEMBER;
             cd.Trait = null;
-            cd.Coefficient = LAI_DEF_AMOUNT;
-            cd.Slope = LAI_DEF_AMOUNT;
-            cd.Intercept = LAI_DEF_AMOUNT;
+            cd.Coefficient = Constants.LAI_DEF_AMOUNT;
+            cd.Slope = Constants.LAI_DEF_AMOUNT;
+            cd.Intercept = Constants.LAI_DEF_AMOUNT;
             return cd;
         }
 
@@ -216,10 +201,10 @@ namespace LifeAI
             ad.RecordList.Add(rd);
             ad.RecordCount++;
 
-            if (ad.RecordCount > LAI_MAX_RECORD)
+            if (ad.RecordCount > Constants.LAI_MAX_RECORD)
             {
                 RemoveRecord(ad, ad.RecordList[0]);
-                ad.RecordCount = LAI_MAX_RECORD;
+                ad.RecordCount = Constants.LAI_MAX_RECORD;
             }
             return rd;
         }
@@ -255,9 +240,9 @@ namespace LifeAI
             RecordTraitData rt = new RecordTraitData();
             rmd.RecordTraitList.Add(rt);
             rt.Trait = null;
-            rt.StartAmount = LAI_DEF_AMOUNT;
-            rt.EndAmount = LAI_DEF_AMOUNT;
-            rt.Change = LAI_DEF_AMOUNT;
+            rt.StartAmount = Constants.LAI_DEF_AMOUNT;
+            rt.EndAmount = Constants.LAI_DEF_AMOUNT;
+            rt.Change = Constants.LAI_DEF_AMOUNT;
             return rt;
         }
 
@@ -268,11 +253,11 @@ namespace LifeAI
 
             sd.TempPlan.Action = null;
             sd.TempPlan.Step = step;
-            sd.TempPlan.Value = LAI_DEF_VALUE;
-            sd.TempPlan.TotalValue = LAI_DEF_VALUE;
+            sd.TempPlan.Value = Constants.LAI_DEF_VALUE;
+            sd.TempPlan.TotalValue = Constants.LAI_DEF_VALUE;
             sd.BestPlan.Action = null;
-            sd.BestPlan.Value = LAI_DEF_VALUE;
-            sd.BestPlan.TotalValue = LAI_DEF_VALUE;
+            sd.BestPlan.Value = Constants.LAI_DEF_VALUE;
+            sd.BestPlan.TotalValue = Constants.LAI_DEF_VALUE;
 
             return sd;
         }
@@ -291,8 +276,8 @@ namespace LifeAI
             planList.Add(pd);
             pd.Step = step;
             pd.Action = null;
-            pd.Value = LAI_DEF_VALUE;
-            pd.TotalValue = LAI_DEF_VALUE;
+            pd.Value = Constants.LAI_DEF_VALUE;
+            pd.TotalValue = Constants.LAI_DEF_VALUE;
             return pd;
         }
 
@@ -392,11 +377,11 @@ namespace LifeAI
         }
 
 
-        public void SetValue(Entity entity, Trait trait, float value, float standard = LAI_DEF_STANDARD)
+        public void SetValue(Entity entity, Trait trait, float value, float standard = Constants.LAI_DEF_STANDARD)
         {
             SetValue(entity, entity, trait, value, standard);
         }
-        public void SetValue(Entity entity, Entity traitOwner, Trait trait, float value, float standard = LAI_DEF_STANDARD)
+        public void SetValue(Entity entity, Entity traitOwner, Trait trait, float value, float standard = Constants.LAI_DEF_STANDARD)
         {
             EntityData ed = FindEntity(entity, true);
             if (ed != null)
@@ -528,7 +513,7 @@ namespace LifeAI
         }
 
 
-        public void SetBasic(Action action, int member, Trait trait, float modify = LAI_DEF_SHIFT)
+        public void SetBasic(Action action, int member, Trait trait, float modify = Constants.LAI_DEF_SHIFT)
         {
             ActionData a = FindAction(action, true);
             MemberData m = FindMember(a, member, true);
@@ -632,7 +617,7 @@ namespace LifeAI
                     return a.Amount;
                 }
             }
-            return LAI_DEF_AMOUNT;
+            return Constants.LAI_DEF_AMOUNT;
         }
 
         public float GetValue(Entity entity, Trait trait, bool standard = false)
@@ -659,7 +644,7 @@ namespace LifeAI
                     }
                 }
             }
-            return LAI_DEF_VALUE;
+            return Constants.LAI_DEF_VALUE;
         }
 
         private bool GetParent(Entity entity, Entity parent)
@@ -768,11 +753,11 @@ namespace LifeAI
                 }
                 return p.Value;
             }
-            return LAI_DEF_VALUE;
+            return Constants.LAI_DEF_VALUE;
         }
 
 
-        public void Plan(int steps = LAI_DEF_STEPS, int reactSteps = LAI_DEF_REACT_STEPS, Action parentAction = null, Entity reactParentEntity = null, float minimumValue = LAI_MIN_ACTION_VALUE)
+        public void Plan(int steps = Constants.LAI_DEF_STEPS, int reactSteps = Constants.LAI_DEF_REACT_STEPS, Action parentAction = null, Entity reactParentEntity = null, float minimumValue = Constants.LAI_MIN_ACTION_VALUE)
         {
             PlanData p;
 
@@ -973,8 +958,8 @@ namespace LifeAI
                         // Skip iterations with double entities 
                         if (!eStack.GroupBy(x => x.Current).Where(g => g.Count() > 1).Any())
                         {
-                            float valueSum = LAI_DEF_VALUE;
-                            float selfValueSum = LAI_DEF_VALUE;
+                            float valueSum = Constants.LAI_DEF_VALUE;
+                            float selfValueSum = Constants.LAI_DEF_VALUE;
 
                             // Optionally display action information when
                             // LAI_DEBUG is enabled
@@ -1007,12 +992,12 @@ namespace LifeAI
                             {
                                 foreach (ModifyData mod in m.ModifyList)
                                 {
-                                    float traitAmount = LAI_DEF_AMOUNT;
-                                    float traitAmount2 = LAI_DEF_AMOUNT;
-                                    float valueTrait = LAI_DEF_VALUE;
-                                    float valueStandard = LAI_DEF_STANDARD;
-                                    float selfValueTrait = LAI_DEF_VALUE;
-                                    float selfValueStandard = LAI_DEF_STANDARD;
+                                    float traitAmount = Constants.LAI_DEF_AMOUNT;
+                                    float traitAmount2 = Constants.LAI_DEF_AMOUNT;
+                                    float valueTrait = Constants.LAI_DEF_VALUE;
+                                    float valueStandard = Constants.LAI_DEF_STANDARD;
+                                    float selfValueTrait = Constants.LAI_DEF_VALUE;
+                                    float selfValueStandard = Constants.LAI_DEF_STANDARD;
                                     bool skipCor = false;
 
                                     TraitAmountData t = FindTraitAmount(eStack.ElementAt(cm2).Current, mod.Trait);
@@ -1029,7 +1014,7 @@ namespace LifeAI
                                     // If unknown, defaults to 0 (indifference)  May not
                                     // always be accurate, but will prevent need for
                                     // excessive data entry.
-                                    ValueTraitData v = FindValueTrait(eStack.ElementAt(LAI_ACTOR_MEMBER).Current, eStack.ElementAt(cm2).Current.Entity, mod.Trait);
+                                    ValueTraitData v = FindValueTrait(eStack.ElementAt(Constants.LAI_ACTOR_MEMBER).Current, eStack.ElementAt(cm2).Current.Entity, mod.Trait);
                                     if (v != null)
                                     {
                                         valueTrait = v.Value;
@@ -1090,7 +1075,7 @@ namespace LifeAI
                                     // to basic/average modify amounts
                                     if (amountCount == 0)
                                     {
-                                        if (a.RecordCount < LAI_MIN_RECORD_AVERAGE)
+                                        if (a.RecordCount < Constants.LAI_MIN_RECORD_AVERAGE)
                                         {
                                             modifyAmount = mod.Basic;
                                         }
@@ -1178,7 +1163,7 @@ namespace LifeAI
                                     {
                                         // Setting "actionParent" to null implies the
                                         // reacting entity will make use of full action list
-                                        PlanStart(entity, reactSteps, 0, null, null, LAI_MIN_REACTION_VALUE);
+                                        PlanStart(entity, reactSteps, 0, null, null, Constants.LAI_MIN_REACTION_VALUE);
 
                                         // Only factor in the first step's value to actor
                                         StepData s = entity.StepList.FirstOrDefault();
@@ -1442,17 +1427,17 @@ namespace LifeAI
                 // Store member entity trait information at the
                 // start of the action.  Does not get stored as
                 // an action record until the action has ended.
-                RecordData r = e[LAI_ACTOR_MEMBER].StartRecord;
+                RecordData r = e[Constants.LAI_ACTOR_MEMBER].StartRecord;
 
                 // remove if there is a prev start record
                 if (r != null)
                 {
                     RemoveStartRecord(r);
                 }
-                r = AddStartRecord(e[LAI_ACTOR_MEMBER]);
+                r = AddStartRecord(e[Constants.LAI_ACTOR_MEMBER]);
 
                 // need action stored here because not stored in record
-                e[LAI_ACTOR_MEMBER].StartAction = action;
+                e[Constants.LAI_ACTOR_MEMBER].StartAction = action;
 
                 for (int i = 0; i < action.MemberCount; i++)
                 {
@@ -1555,12 +1540,12 @@ namespace LifeAI
             float xysum = 0;
             float xxsum = 0;
 
-            float[] y = new float[LAI_MAX_RECORD];
-            float[] yy = new float[LAI_MAX_RECORD];
-            float[] x = new float[LAI_MAX_RECORD];
-            float[] xx = new float[LAI_MAX_RECORD];
-            float[] xy = new float[LAI_MAX_RECORD];
-            bool[] has_rec = new bool[2 * LAI_MAX_RECORD];
+            float[] y = new float[Constants.LAI_MAX_RECORD];
+            float[] yy = new float[Constants.LAI_MAX_RECORD];
+            float[] x = new float[Constants.LAI_MAX_RECORD];
+            float[] xx = new float[Constants.LAI_MAX_RECORD];
+            float[] xy = new float[Constants.LAI_MAX_RECORD];
+            bool[] has_rec = new bool[2 * Constants.LAI_MAX_RECORD];
             foreach (MemberData m in a.MemberList)
             {
                 foreach (Trait t in Trait.mainTraitList)
@@ -1608,7 +1593,7 @@ namespace LifeAI
                 }
             }
 
-            if (a.RecordCount >= LAI_MIN_RECORD_CORRELATION)
+            if (a.RecordCount >= Constants.LAI_MIN_RECORD_CORRELATION)
             {
                 // Calculate correlation data
                 // Correlation-based learning of mod amounts in actions
@@ -1627,7 +1612,7 @@ namespace LifeAI
                     // Loop through main trait members
                     foreach (Trait t in Trait.mainTraitList)
                     {
-                        for (int i = 0; i < LAI_MAX_RECORD; i++)
+                        for (int i = 0; i < Constants.LAI_MAX_RECORD; i++)
                         {
                             y[i] = 0;
                             yy[i] = 0;
@@ -1689,13 +1674,13 @@ namespace LifeAI
                                     xsum = 0;
                                     xxsum = 0;
                                     xysum = 0;
-                                    for (int i = 0; i < LAI_MAX_RECORD; i++)
+                                    for (int i = 0; i < Constants.LAI_MAX_RECORD; i++)
                                     {
                                         x[i] = 0;
                                         xx[i] = 0;
                                         xy[i] = 0;
                                         // simulating 2dim array
-                                        has_rec[LAI_MAX_RECORD + i] = false;
+                                        has_rec[Constants.LAI_MAX_RECORD + i] = false;
                                     }
 
                                     recordCount = 0;
@@ -1711,7 +1696,7 @@ namespace LifeAI
                                                 RecordTraitData rt = rm.RecordTraitList.FirstOrDefault(z => z.Trait == t2);
                                                 if (rt != null)
                                                 {
-                                                    has_rec[LAI_MAX_RECORD + recordCount] = true;
+                                                    has_rec[Constants.LAI_MAX_RECORD + recordCount] = true;
 
                                                     // paired trait combo in same record, so increase count
                                                     ct++;
@@ -1753,7 +1738,7 @@ namespace LifeAI
 
                                         // Generate a correlation record
                                         // if coefficient is strong enough
-                                        if ((coef >= LAI_MIN_COEF) || (coef <= -LAI_MIN_COEF))
+                                        if ((coef >= Constants.LAI_MIN_COEF) || (coef <= -Constants.LAI_MIN_COEF))
                                         {
                                             // see if modify exists for the trait, add one if there isn't
                                             ModifyData mod2 = FindModify(m, t, true);
@@ -1836,7 +1821,7 @@ namespace LifeAI
                     }
                 }
             }
-            return LAI_DEF_AMOUNT;
+            return Constants.LAI_DEF_AMOUNT;
         }
 
         private CorrelationData FindCorrelation(ModifyData mod, int correlationNumber, bool add=false)
