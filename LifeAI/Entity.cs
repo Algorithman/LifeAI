@@ -56,14 +56,14 @@ namespace LifeAI
                     traitAmountData.Amount += amount;
                 }
             }
-
         }
+
         public TraitAmountData FindTraitAmount(EntityData entity, Trait trait, bool add = false)
         {
-            TraitAmountData tmd = entity.TraitAmountList.FirstOrDefault(x => x.Trait == trait);
-            if (tmd != null)
+            TraitAmountData traitAmountData = entity.TraitAmountList.FirstOrDefault(x => x.Trait == trait);
+            if (traitAmountData != null)
             {
-                return tmd;
+                return traitAmountData;
             }
             if (add)
             {
@@ -1154,7 +1154,7 @@ namespace LifeAI
                                 // since the amounts can change.
                                 foreach (AltTraitData altx in actor.StepTrack.AltTraitList)
                                 {
-                                    altx.Trait.Amount = alt.AltAmount;
+                                    altx.Trait.Amount = altx.AltAmount;
                                 }
 
                                 // Calculate reactions of entities involved in action
@@ -1344,7 +1344,7 @@ namespace LifeAI
                             // step or reactions
                             foreach (AltTraitData alt2 in actor.StepTrack.AltTraitList)
                             {
-                                alt2.Trait.Amount = alt.Amount;
+                                alt2.Trait.Amount = alt2.Amount;
                             }
                             actor.StepTrack.AltTraitList.Clear();
                         }
@@ -1555,24 +1555,24 @@ namespace LifeAI
             float[] xx = new float[Constants.LAI_MAX_RECORD];
             float[] xy = new float[Constants.LAI_MAX_RECORD];
             bool[] has_rec = new bool[2 * Constants.LAI_MAX_RECORD];
-            foreach (MemberData m in a.MemberList)
+            foreach (MemberData member in a.MemberList)
             {
-                foreach (Trait t in Trait.mainTraitList)
+                foreach (Trait trait in Trait.mainTraitList)
                 {
                     sum = 0;
                     average = 0;
                     ct = 0;
-                    foreach (RecordData r in a.RecordList)
+                    foreach (RecordData record in a.RecordList)
                     {
                         // Match member with a record member
-                        foreach (RecordMemberData rm in r.RecordMemberList)
+                        foreach (RecordMemberData recordMember in record.RecordMemberList)
                         {
-                            if (rm.Number == m.Number)
+                            if (recordMember.Number == member.Number)
                             {
-                                RecordTraitData rt = FindRecordTrait(rm, t);
-                                if (rt != null)
+                                RecordTraitData recordTrait = FindRecordTrait(recordMember, trait);
+                                if (recordTrait != null)
                                 {
-                                    sum += rt.Change;
+                                    sum += recordTrait.Change;
                                 }
                                 // ct increments regardless of whether record member
                                 // trait contains info or not because defaults to 0
@@ -1582,21 +1582,21 @@ namespace LifeAI
                         }
                     }
                     // calculate average
-                    if ((sum > 0) && (ct > 0))
+                    if ((sum != 0) && (ct != 0))
                     {
                         average = sum / ct;
                     }
 
                     // See if a member trait exists for average
                     // If not, create one if the avg != 0
-                    ModifyData mod = FindModify(m, t);
+                    ModifyData mod = FindModify(member, trait);
                     if (mod != null)
                     {
                         mod.Average = average;
                     }
-                    else if (average > 0)
+                    else if (average != 0)
                     {
-                        mod = AddModify(m, t);
+                        mod = AddModify(member, trait);
                         mod.Average = average;
                     }
                 }
@@ -1616,10 +1616,10 @@ namespace LifeAI
                 // traits and comparing to all traits.
 
                 // Loop through member records
-                foreach (MemberData m in a.MemberList)
+                foreach (MemberData member in a.MemberList)
                 {
                     // Loop through main trait members
-                    foreach (Trait t in Trait.mainTraitList)
+                    foreach (Trait trait in Trait.mainTraitList)
                     {
                         for (int i = 0; i < Constants.LAI_MAX_RECORD; i++)
                         {
@@ -1630,8 +1630,8 @@ namespace LifeAI
 
                         // Reset correlation data for the trait
                         // (delete the correlation list)
-                        // rest hasCorrelation flag back to 0
-                        ModifyData mod = FindModify(m, t);
+                        // reset hasCorrelation flag back to 0
+                        ModifyData mod = FindModify(member, trait);
                         if (mod != null)
                         {
                             mod.CorrelationList.Clear();
@@ -1640,16 +1640,16 @@ namespace LifeAI
                         int recordCount = 0;
                         ct = 0;
                         // Cycle through records for first member/trait combination
-                        foreach (RecordData r in a.RecordList)
+                        foreach (RecordData record in a.RecordList)
                         {
                             // Collect Y data from record for the specified
                             // member and trait.  Match member with a record member
                             // Need here because can differ in each record
-                            RecordMemberData rm = r.RecordMemberList.FirstOrDefault(z => z.Number == m.Number);
-                            if (rm != null)
+                            RecordMemberData recordMember = record.RecordMemberList.FirstOrDefault(z => z.Number == member.Number);
+                            if (recordMember != null)
                             {
-                                RecordTraitData rt = rm.RecordTraitList.FirstOrDefault(z => z.Trait == t);
-                                if (rt != null)
+                                RecordTraitData recordTrait = recordMember.RecordTraitList.FirstOrDefault(z => z.Trait == trait);
+                                if (recordTrait != null)
                                 {
                                     has_rec[recordCount] = true;
                                     ct++;
@@ -1659,7 +1659,7 @@ namespace LifeAI
                                     // Don't want to calculate ysum and yysum yet
                                     // because not confirmed if there is a matching
                                     // 2nd trait yet
-                                    y[recordCount] = rt.Change;
+                                    y[recordCount] = recordTrait.Change;
                                     yy[recordCount] = y[recordCount] * y[recordCount];
                                 }
                             }
@@ -1672,11 +1672,11 @@ namespace LifeAI
                         // Collect X data from other members and their
                         // various traits.  Only process if there was
                         // a record found for the original matching trait
-                        if (ct > 0)
+                        if (ct != 0)
                         {
-                            foreach (MemberData m2 in a.MemberList)
+                            foreach (MemberData member2 in a.MemberList)
                             {
-                                foreach (Trait t2 in Trait.mainTraitList)
+                                foreach (Trait trait2 in Trait.mainTraitList)
                                 {
                                     ysum = 0;
                                     yysum = 0;
@@ -1699,11 +1699,11 @@ namespace LifeAI
                                         if (has_rec[recordCount])
                                         {
                                             // record member list
-                                            RecordMemberData rm = r.RecordMemberList.FirstOrDefault(z => z.Number == m2.Number);
-                                            if (rm != null)
+                                            RecordMemberData recordMember = r.RecordMemberList.FirstOrDefault(z => z.Number == member2.Number);
+                                            if (recordMember != null)
                                             {
-                                                RecordTraitData rt = rm.RecordTraitList.FirstOrDefault(z => z.Trait == t2);
-                                                if (rt != null)
+                                                RecordTraitData recordTrait = recordMember.RecordTraitList.FirstOrDefault(z => z.Trait == trait2);
+                                                if (recordTrait != null)
                                                 {
                                                     has_rec[Constants.LAI_MAX_RECORD + recordCount] = true;
 
@@ -1717,7 +1717,7 @@ namespace LifeAI
 
                                                     // The "X" data is gathered from the 2nd
                                                     // trait's start amount
-                                                    x[recordCount] = rt.StartAmount;
+                                                    x[recordCount] = recordTrait.StartAmount;
                                                     xx[recordCount] = x[recordCount] * x[recordCount];
                                                     xy[recordCount] = x[recordCount] * y[recordCount];
 
@@ -1732,7 +1732,7 @@ namespace LifeAI
                                         recordCount++;
                                     }
 
-                                    if ((ct > 0) && (xsum != 0) && (ysum != 0))
+                                    if ((ct != 0) && (xsum != 0) && (ysum != 0))
                                     {
                                         float coef = 0;
 
@@ -1747,18 +1747,19 @@ namespace LifeAI
 
                                         // Generate a correlation record
                                         // if coefficient is strong enough
+                                        Trace.WriteLine("Coef for " + trait.Name + "/"+trait2.Name+": " + coef);
                                         if ((coef >= Constants.LAI_MIN_COEF) || (coef <= -Constants.LAI_MIN_COEF))
                                         {
                                             // see if modify exists for the trait, add one if there isn't
-                                            ModifyData mod2 = FindModify(m, t, true);
+                                            ModifyData mod2 = FindModify(member, trait, true);
                                             if (mod2 != null)
                                             {
                                                 CorrelationData c = AddCorrelation(mod2);
                                                 c.Coefficient = coef;
                                                 c.Slope = num / deno1;
                                                 c.Intercept = ((ysum * xxsum) - (xsum * xysum)) / deno1;
-                                                c.Trait = t2;
-                                                c.Member = m2.Number;
+                                                c.Trait = trait2;
+                                                c.Member = member2.Number;
                                             }
                                         }
                                     }

@@ -8,7 +8,7 @@ namespace LifeAI
 {
     public class Action
     {
-        private static List<Action> mainActionList = new List<Action>();
+        public static List<Action> mainActionList = new List<Action>();
         private static int mainActionCount = 0;
 
         public List<Func<bool, Entity>> Preconditions = new List<Func<bool, Entity>>();
@@ -42,26 +42,12 @@ namespace LifeAI
 
         public Action GetAction(int number)
         {
-            foreach (Action action in mainActionList)
-            {
-                if (action.Number == number)
-                {
-                    return action;
-                }
-            }
-            return null;
+            return mainActionList.FirstOrDefault(x => x.Number == number);
         }
 
         public Action GetAction(string name)
         {
-            foreach (Action action in mainActionList)
-            {
-                if (action.Name == name)
-                {
-                    return action;
-                }
-            }
-            return null;
+            return mainActionList.FirstOrDefault(x=>x.Name==name);
         }
 
         public void SetName(string name)
